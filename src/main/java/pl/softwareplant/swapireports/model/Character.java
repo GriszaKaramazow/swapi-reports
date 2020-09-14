@@ -1,4 +1,4 @@
-package pl.softwareplant.swapireports.Model;
+package pl.softwareplant.swapireports.model;
 
 public class Character {
 
