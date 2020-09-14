@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,8 +21,10 @@ public class Film {
 
     private String filmTitle;
 
+    @ManyToOne
     private Character character;
 
+    @ManyToOne
     private Planet planet;
 
 }
