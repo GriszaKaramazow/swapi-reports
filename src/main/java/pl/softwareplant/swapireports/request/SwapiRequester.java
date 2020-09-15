@@ -9,7 +9,9 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class SwapiRequester {
@@ -21,7 +23,7 @@ public class SwapiRequester {
     private final String CHARACTER_SEARCH_ENDPOINT = "/people/?search=";
     private final String PLANET_SEARCH_ENDPOINT = "/planets/?search=";
     
-    private Set<RespondDTO> getCharacterOrPlanet(String endpoint, String query) throws IOException, InterruptedException {
+    private Set<RespondDTO> getCharactersOrPlanets(String endpoint, String query) throws IOException, InterruptedException {
         Set<RespondDTO> respondDTOs = new HashSet<>();
         String bodyString = getFromSwapi(endpoint, query);
         JSONObject bodyJson = new JSONObject(bodyString);
@@ -29,31 +31,39 @@ public class SwapiRequester {
         int resultCount = bodyJson.getInt("count");
         for (int i = 0; i < resultCount; i++) {
             RespondDTO respondDTO = new RespondDTO();
-            respondDTO.setId(Long.parseLong(resultArray.getJSONObject(i)
-                    .getString("url")
-                    .substring("http://localhost:8080/api".length())
-                    .replaceAll("\\D+","")));
+            respondDTO.setId(getIdFromUrl(resultArray.getJSONObject(i)
+                    .getString("url")));
             respondDTO.setName(resultArray.getJSONObject(i)
                     .getString("name"));
             Set<Long> films = new HashSet<>();
             JSONArray filmsArray = resultArray.getJSONObject(i).getJSONArray("films");
             for (int j = 0; j < filmsArray.length(); j++) {
-                films.add(Long.parseLong(filmsArray.getString(j)
-                        .substring("http://localhost:8080/api".length())
-                        .replaceAll("\\D+","")));
+                films.add(getIdFromUrl(filmsArray.getString(j)));
             }
             respondDTOs.add(respondDTO);
         }
         return respondDTOs;
     }
 
-
-    public Set<RespondDTO> getCharacter(String query) throws IOException, InterruptedException {
-        return getCharacterOrPlanet(CHARACTER_SEARCH_ENDPOINT, query);
+    private Long getIdFromUrl(String url) {
+        return Long.parseLong(url.substring("http://localhost:8080/api".length())
+                .replaceAll("\\D+",""));
     }
 
-    public Set<RespondDTO> getPlanet(String query) throws IOException, InterruptedException {
-        return getCharacterOrPlanet(PLANET_SEARCH_ENDPOINT, query);
+    public Set<RespondDTO> getCharacters(String query) throws IOException, InterruptedException {
+        return getCharactersOrPlanets(CHARACTER_SEARCH_ENDPOINT, query);
+    }
+
+    public Set<RespondDTO> getPlanets(String query) throws IOException, InterruptedException {
+        return getCharactersOrPlanets(PLANET_SEARCH_ENDPOINT, query);
+    }
+
+    public Map<Long, String> getTitlesFromIds(Set<Long> filmIds) throws IOException, InterruptedException {
+        Map<Long, String> filmTitles = new HashMap<>();
+        for (Long filmId : filmIds) {
+            filmTitles.put(filmId, getTitleFromFilmId(filmId));
+        }
+        return filmTitles;
     }
 
     public String getTitleFromFilmId(Long filmId) throws IOException, InterruptedException {

@@ -37,10 +37,10 @@ public class ReportService {
     public void saveOrUpdate(Long id, QueryDTO queryDTO) throws IOException, InterruptedException {
 
         System.out.println(queryDTO.getQuery_criteria_character_phrase());
-        System.out.println(swapiRequester.getCharacter(queryDTO.getQuery_criteria_character_phrase()));
+        System.out.println(swapiRequester.getCharacters(queryDTO.getQuery_criteria_character_phrase()));
 
         System.out.println(queryDTO.getQuery_criteria_planet_name());
-        System.out.println(swapiRequester.getPlanet(queryDTO.getQuery_criteria_planet_name()));
+        System.out.println(swapiRequester.getPlanets(queryDTO.getQuery_criteria_planet_name()));
     }
 
     public void deleteAll() {
