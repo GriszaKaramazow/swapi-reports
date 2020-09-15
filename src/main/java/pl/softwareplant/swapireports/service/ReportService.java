@@ -13,7 +13,9 @@ import pl.softwareplant.swapireports.repository.PlanetRepository;
 import pl.softwareplant.swapireports.repository.ReportRepository;
 import pl.softwareplant.swapireports.request.SwapiRequester;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -40,12 +42,17 @@ public class ReportService {
     }
 
     public void saveOrUpdate(Long id, QueryDTO queryDTO) throws IOException, InterruptedException {
-
-        System.out.println(queryDTO.getQuery_criteria_character_phrase());
-        System.out.println(swapiRequester.getCharacters(queryDTO.getQuery_criteria_character_phrase()));
-
-        System.out.println(queryDTO.getQuery_criteria_planet_name());
-        System.out.println(swapiRequester.getPlanets(queryDTO.getQuery_criteria_planet_name()));
+        Set<RespondDTO> characters = swapiRequester.getCharacters(queryDTO.getQuery_criteria_character_phrase());
+        Set<RespondDTO> planets = swapiRequester.getPlanets(queryDTO.getQuery_criteria_planet_name());
+        Set<Film> films = new HashSet<>();
+        for (RespondDTO character : characters) {
+            for (RespondDTO planet : planets) {
+                if (character.getFilmId().equals(planet.getFilmId())) {
+                    films.add(generateFilm(character, planet, character.getFilmId()));
+                }
+            }
+        }
+        reportRepository.save(createReport(id, queryDTO, films));
     }
 
     public void deleteAll() {
@@ -63,6 +70,17 @@ public class ReportService {
     public Report findById(Long reportId) {
         return reportRepository.findById(reportId)
                 .orElse(new Report());
+    }
+
+    @Transactional
+    private Film generateFilm(RespondDTO characterDTO, RespondDTO planetDTO, Long filmId) throws IOException, InterruptedException {
+        Character character = getCharacterFromRespondDTO(characterDTO);
+        characterRepository.save(character);
+        Planet planet = getPlanetFromRespondDTO(planetDTO);
+        planetRepository.save(planet);
+        String filmTitle = swapiRequester.getTitleFromFilmId(filmId);
+        return filmRepository.save(getFilmFromCharacterAndPlanet(filmId, filmTitle, character, planet));
+
     }
 
     private Planet getPlanetFromRespondDTO(RespondDTO respondDTO) {
