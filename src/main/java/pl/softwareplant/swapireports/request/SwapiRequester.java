@@ -42,6 +42,12 @@ public class SwapiRequester {
         return getCharacterOrPlanet(PLANET_SEARCH_ENDPOINT, query);
     }
 
+    public String getTitleFromFilmId(Long filmId) throws IOException, InterruptedException {
+        String bodyString = getFromSwapi("/films/", filmId.toString());
+        JSONObject bodyJson = new JSONObject(bodyString);
+        return bodyJson.getString("title");
+    }
+
     public String getFromSwapi(String endpoint, String query) throws IOException, InterruptedException {
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8080/api" + endpoint + query))

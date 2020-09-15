@@ -47,7 +47,7 @@ public class ReportService {
         reportRepository.deleteAll();
     }
 
-    public void deleteById(Long id) throws IOException {
+    public void deleteById(Long id) {
         reportRepository.deleteById(id);
     }
 
