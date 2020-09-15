@@ -35,7 +35,7 @@ public class ReportController {
 
     @DeleteMapping("/{reportId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteById(@PathVariable Long reportId) {
+    public void deleteById(@PathVariable Long reportId) throws IOException {
         System.out.println("DELETE at /reports/" + reportId);
         reportService.deleteById(reportId);
     }
