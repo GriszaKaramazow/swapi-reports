@@ -2,14 +2,11 @@ package pl.softwareplant.swapireports.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import pl.softwareplant.swapireports.dto.QueryDTO;
 import pl.softwareplant.swapireports.model.Report;
 import pl.softwareplant.swapireports.service.ReportService;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.List;
 
 @RestController
@@ -22,10 +19,11 @@ public class ReportController {
         this.reportService = reportService;;
     }
 
-    @PutMapping("/{report_id}")
+    @PutMapping("/{reportId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateOrCreateReport(@PathVariable Long reportId) {
-        System.out.println("PUT at /reports");
+    public void updateOrCreateReport(@PathVariable Long reportId, @RequestBody QueryDTO queryDTO) throws IOException, InterruptedException {
+        System.out.println("PUT at /reports/" + reportId);
+        reportService.saveOrUpdate(reportId, queryDTO);
     }
 
     @DeleteMapping
@@ -35,17 +33,10 @@ public class ReportController {
         reportService.deleteAll();
     }
 
-    @DeleteMapping("/{report_id}")
+    @DeleteMapping("/{reportId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteById(@PathVariable Long reportId) throws IOException, InterruptedException {
-        System.out.println("DELETE at /reports/{report_id}");
-        HttpClient httpClient = HttpClient.newBuilder()
-                .build();
-        HttpRequest httpRequest = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/api/people/" + reportId))
-                .build();
-        HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        System.out.println(httpResponse.body());
+    public void deleteById(@PathVariable Long reportId) {
+        System.out.println("DELETE at /reports/" + reportId);
         reportService.deleteById(reportId);
     }
 
@@ -55,9 +46,9 @@ public class ReportController {
         return reportService.findAll();
     }
 
-    @GetMapping("/{report_id}")
+    @GetMapping("/{reportId}")
     public Report findById(@PathVariable Long reportId) {
-        System.out.println("GET at /reports/{report_id}");
+        System.out.println("GET at /reports/" + reportId);
         return reportService.findById(reportId);
     }
 
