@@ -11,12 +11,12 @@ import java.util.Set;
 @AllArgsConstructor
 @Setter
 @Getter
-public class CharacterDTO {
+public class RespondDTO {
 
-    private String id;
+    private Long id;
 
     private String name;
 
-    private Set<String> films;
+    private Set<Long> films;
 
 }
