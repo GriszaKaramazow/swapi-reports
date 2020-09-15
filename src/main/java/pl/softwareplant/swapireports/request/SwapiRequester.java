@@ -24,23 +24,21 @@ public class SwapiRequester {
     private final String PLANET_SEARCH_ENDPOINT = "/planets/?search=";
     
     private Set<RespondDTO> getCharactersOrPlanets(String endpoint, String query) throws IOException, InterruptedException {
+
         Set<RespondDTO> respondDTOs = new HashSet<>();
         String bodyString = getFromSwapi(endpoint, query);
         JSONObject bodyJson = new JSONObject(bodyString);
         JSONArray resultArray = bodyJson.getJSONArray("results");
         int resultCount = bodyJson.getInt("count");
         for (int i = 0; i < resultCount; i++) {
-            RespondDTO respondDTO = new RespondDTO();
-            respondDTO.setId(getIdFromUrl(resultArray.getJSONObject(i)
-                    .getString("url")));
-            respondDTO.setName(resultArray.getJSONObject(i)
-                    .getString("name"));
-            Set<Long> films = new HashSet<>();
+            Long resourceId = getIdFromUrl(resultArray.getJSONObject(i)
+                    .getString("url"));
+            String resourceName = resultArray.getJSONObject(i)
+                    .getString("name");
             JSONArray filmsArray = resultArray.getJSONObject(i).getJSONArray("films");
             for (int j = 0; j < filmsArray.length(); j++) {
-                films.add(getIdFromUrl(filmsArray.getString(j)));
+                respondDTOs.add(new RespondDTO(resourceId, resourceName, getIdFromUrl(filmsArray.getString(j))));
             }
-            respondDTOs.add(respondDTO);
         }
         return respondDTOs;
     }

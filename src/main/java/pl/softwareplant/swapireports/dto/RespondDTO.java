@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
@@ -17,6 +15,6 @@ public class RespondDTO {
 
     private String name;
 
-    private Set<Long> films;
+    private Long filmId;
 
 }

@@ -18,6 +18,6 @@ public class Planet {
     @Id
     private Long id;
 
-    private String planetName;
+    private String name;
 
 }

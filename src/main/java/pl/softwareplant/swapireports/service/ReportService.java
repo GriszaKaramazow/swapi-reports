@@ -2,6 +2,10 @@ package pl.softwareplant.swapireports.service;
 
 import org.springframework.stereotype.Service;
 import pl.softwareplant.swapireports.dto.QueryDTO;
+import pl.softwareplant.swapireports.dto.RespondDTO;
+import pl.softwareplant.swapireports.model.Character;
+import pl.softwareplant.swapireports.model.Film;
+import pl.softwareplant.swapireports.model.Planet;
 import pl.softwareplant.swapireports.model.Report;
 import pl.softwareplant.swapireports.repository.CharacterRepository;
 import pl.softwareplant.swapireports.repository.FilmRepository;
@@ -11,6 +15,7 @@ import pl.softwareplant.swapireports.request.SwapiRequester;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ReportService {
@@ -58,6 +63,22 @@ public class ReportService {
     public Report findById(Long reportId) {
         return reportRepository.findById(reportId)
                 .orElse(new Report());
+    }
+
+    private Planet getPlanetFromRespondDTO(RespondDTO respondDTO) {
+        return new Planet(respondDTO.getId(), respondDTO.getName());
+    }
+
+    private Character getCharacterFromRespondDTO(RespondDTO respondDTO) {
+        return new Character(respondDTO.getId(), respondDTO.getName());
+    }
+
+    private Film getFilmFromCharacterAndPlanet(Long filmId, String filmTitle, Character character, Planet planet) {
+        return new Film(filmId, filmTitle, character, planet);
+    }
+
+    private Report createReport(Long reportId, QueryDTO queryDTO, Set<Film> films) {
+        return new Report(reportId, queryDTO.getQuery_criteria_character_phrase(), queryDTO.getQuery_criteria_character_phrase(), films);
     }
 
 }

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import java.util.List;
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,6 +25,6 @@ public class Report {
     private String queryCriteriaPlanetName;
 
     @ManyToMany
-    private List<Film> resultFilms;
+    private Set<Film> resultFilms;
 
 }
