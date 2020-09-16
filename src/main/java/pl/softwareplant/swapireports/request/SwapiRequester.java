@@ -1,5 +1,6 @@
 package pl.softwareplant.swapireports.request;
 
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,11 +11,10 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
+@Slf4j
 public class SwapiRequester {
 
     private final HttpClient httpClient = HttpClient.newBuilder()
@@ -24,16 +24,30 @@ public class SwapiRequester {
     @Value("${swapi.character.request}")
     private String CHARACTER_REQUEST_ENDPOINT;
 
+    @Value("${swapi.film.request}")
+    private String FILM_REQUEST_ENDPOINT;
+
     @Value("${swapi.planet.request}")
     private String PLANET_REQUEST_ENDPOINT;
 
     @Value("${swapi.url.address}")
     private String SWAPI_URL_ADDRESS;
-    
-    private Set<RespondDTO> getCharactersOrPlanets(String endpoint, String query) throws IOException, InterruptedException {
+
+    private String getRawDataFromSwapi(String endpoint, String query) {
+        String bodyString = null;
+        try {
+            bodyString = getFromSwapi(endpoint, query);
+        } catch (IOException | InterruptedException exception) {
+            log.error("Error requesting data from The Star Wars API", exception);
+//            throw new ConnectException("Error requesting data from The Star Wars API");
+        }
+        return bodyString;
+    }
+
+    private Set<RespondDTO> getCharactersOrPlanets(String endpoint, String query) {
 
         Set<RespondDTO> respondDTOs = new HashSet<>();
-        String bodyString = getFromSwapi(endpoint, query);
+        String bodyString = getRawDataFromSwapi(endpoint, query);
         JSONObject bodyJson = new JSONObject(bodyString);
         JSONArray resultArray = bodyJson.getJSONArray("results");
         int resultCount = bodyJson.getInt("count");
@@ -55,24 +69,16 @@ public class SwapiRequester {
                 .replaceAll("\\D+",""));
     }
 
-    public Set<RespondDTO> getCharacters(String query) throws IOException, InterruptedException {
+    public Set<RespondDTO> getCharacters(String query) {
         return getCharactersOrPlanets(CHARACTER_REQUEST_ENDPOINT, query);
     }
 
-    public Set<RespondDTO> getPlanets(String query) throws IOException, InterruptedException {
+    public Set<RespondDTO> getPlanets(String query) {
         return getCharactersOrPlanets(PLANET_REQUEST_ENDPOINT, query);
     }
 
-    public Map<Long, String> getTitlesFromIds(Set<Long> filmIds) throws IOException, InterruptedException {
-        Map<Long, String> filmTitles = new HashMap<>();
-        for (Long filmId : filmIds) {
-            filmTitles.put(filmId, getTitleFromFilmId(filmId));
-        }
-        return filmTitles;
-    }
-
-    public String getTitleFromFilmId(Long filmId) throws IOException, InterruptedException {
-        String bodyString = getFromSwapi("/films/", filmId.toString());
+    public String getTitleFromFilmId(Long filmId) {
+        String bodyString = getRawDataFromSwapi(FILM_REQUEST_ENDPOINT, filmId.toString());
         JSONObject bodyJson = new JSONObject(bodyString);
         return bodyJson.getString("title");
     }
@@ -82,10 +88,8 @@ public class SwapiRequester {
                 .uri(URI.create(SWAPI_URL_ADDRESS + endpoint + query))
                 .GET()
                 .build();
-        HttpResponse<String> httpResponse = httpClient
-                .send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
         return httpResponse.body();
-
     }
 
 }

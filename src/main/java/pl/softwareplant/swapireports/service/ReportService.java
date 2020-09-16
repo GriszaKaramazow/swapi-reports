@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import pl.softwareplant.swapireports.dto.QueryDTO;
 import pl.softwareplant.swapireports.dto.ReportDTO;
 import pl.softwareplant.swapireports.dto.RespondDTO;
+import pl.softwareplant.swapireports.exception.ResourceNotFoundException;
 import pl.softwareplant.swapireports.mapper.ReportMapper;
 import pl.softwareplant.swapireports.model.Character;
 import pl.softwareplant.swapireports.model.*;
@@ -12,7 +13,6 @@ import pl.softwareplant.swapireports.repository.*;
 import pl.softwareplant.swapireports.request.SwapiRequester;
 
 import javax.transaction.Transactional;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,7 +45,7 @@ public class ReportService {
         this.reportMapper = reportMapper;
     }
 
-    public void saveOrUpdate(Long id, QueryDTO queryDTO) throws IOException, InterruptedException {
+    public void saveOrUpdate(Long id, QueryDTO queryDTO) {
         Set<RespondDTO> characters = swapiRequester.getCharacters(queryDTO.getQuery_criteria_character_phrase());
         Set<RespondDTO> planets = swapiRequester.getPlanets(queryDTO.getQuery_criteria_planet_name());
         Set<Result> films = new HashSet<>();
@@ -67,6 +67,9 @@ public class ReportService {
     }
 
     public void deleteById(Long id) {
+        if (!reportRepository.existsById(id)) {
+            throw new ResourceNotFoundException("report {id=" + id + "} have not been found");
+        }
         reportRepository.deleteById(id);
         log.info("report {id=" + id + "} have been deleted");
     }
@@ -75,30 +78,32 @@ public class ReportService {
         return reportMapper.mapModelListToDTOList(reportRepository.findAll());
     }
 
-    public ReportDTO findById(Long reportId) {
-        return reportMapper.mapModelToDTO(reportRepository.findById(reportId)
-                .orElse(new Report()));
+    public ReportDTO getOne(Long id) {
+        if (!reportRepository.existsById(id)) {
+            throw new ResourceNotFoundException("report {id=" + id + "} have not been found");
+        }
+        return reportMapper.mapModelToDTO(reportRepository.getOne(id));
     }
 
     @Transactional
-    private Result generateResult(RespondDTO characterDTO, RespondDTO planetDTO, Long filmId) throws IOException, InterruptedException {
+    private Result generateResult(RespondDTO characterDTO, RespondDTO planetDTO, Long filmId) {
         Character character = getCharacterFromRespondDTO(characterDTO);
-        characterRepository.save(character);
         Planet planet = getPlanetFromRespondDTO(planetDTO);
-        planetRepository.save(planet);
         Film film = getFilmFromFilmId(filmId);
-        filmRepository.save(film);
-        return resultRepository.save(getResult(film, character, planet));
+        Result result = getResult(film, character, planet);
+        return result;
 
     }
 
-    private Film getFilmFromFilmId(Long filmId) throws IOException, InterruptedException {
+    private Film getFilmFromFilmId(Long filmId) {
         if (filmRepository.existsById(filmId)) {
             return filmRepository.getOne(filmId);
         }
         Film film = new Film();
         film.setId(filmId);
         film.setName(swapiRequester.getTitleFromFilmId(filmId));
+        filmRepository.save(film);
+        log.info("film {id =" + film.getId() + "} have been added. " + film.toString());
         return film;
     }
 
@@ -109,6 +114,8 @@ public class ReportService {
         Planet planet = new Planet();
         planet.setId(respondDTO.getId());
         planet.setName(respondDTO.getName());
+        planetRepository.save(planet);
+        log.info("planet {id =" + planet.getId() + "} have been added. " + planet.toString());
         return planet;
     }
 
@@ -119,6 +126,8 @@ public class ReportService {
         Character character = new Character();
         character.setId(respondDTO.getId());
         character.setCharacterName(respondDTO.getName());
+        characterRepository.save(character);
+        log.info("character {id =" + character.getId() + "} have been added. " + character.toString());
         return character;
     }
 
@@ -127,11 +136,20 @@ public class ReportService {
         result.setFilm(film);
         result.setCharacter(character);
         result.setPlanet(planet);
+        resultRepository.save(result);
+        log.info("character {id =" + result.getId() + "} have been added. " + result.toString());
         return result;
     }
 
-    private Report createReport(Long reportId, QueryDTO queryDTO, Set<Result> films) {
-        return new Report(reportId, queryDTO.getQuery_criteria_character_phrase(), queryDTO.getQuery_criteria_planet_name(), films);
+    private Report createReport(Long reportId, QueryDTO queryDTO, Set<Result> results) {
+        Report report = new Report();
+        report.setId(reportId);
+        report.setQueryCriteriaCharacterPhrase(queryDTO.getQuery_criteria_character_phrase());
+        report.setQueryCriteriaPlanetName(queryDTO.getQuery_criteria_planet_name());
+        report.setResults(results);
+        reportRepository.save(report);
+        log.info("report {id =" + report.getId() + "} have been added. " + report.toString());
+        return report;
     }
 
 }

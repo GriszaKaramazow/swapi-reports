@@ -7,7 +7,6 @@ import pl.softwareplant.swapireports.dto.QueryDTO;
 import pl.softwareplant.swapireports.dto.ReportDTO;
 import pl.softwareplant.swapireports.service.ReportService;
 
-import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -23,7 +22,7 @@ public class ReportController {
 
     @PutMapping("/{reportId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateOrCreateReport(@PathVariable Long reportId, @RequestBody QueryDTO queryDTO) throws IOException, InterruptedException {
+    public void updateOrCreateReport(@PathVariable Long reportId, @RequestBody QueryDTO queryDTO) {
         log.info("PUT request have been received at /reports/" + reportId);
         reportService.saveOrUpdate(reportId, queryDTO);
     }
@@ -49,9 +48,9 @@ public class ReportController {
     }
 
     @GetMapping("/{reportId}")
-    public ReportDTO findById(@PathVariable Long reportId) {
+    public ReportDTO getOne(@PathVariable Long reportId) {
         log.info("GET request have been received at /reports/" + reportId);
-        return reportService.findById(reportId);
+        return reportService.getOne(reportId);
     }
 
 }
