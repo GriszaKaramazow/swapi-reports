@@ -25,6 +25,6 @@ public class Report {
     private String queryCriteriaPlanetName;
 
     @ManyToMany
-    private Set<Result> resultFilms;
+    private Set<Result> results;
 
 }

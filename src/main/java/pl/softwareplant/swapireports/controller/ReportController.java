@@ -3,6 +3,7 @@ package pl.softwareplant.swapireports.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import pl.softwareplant.swapireports.dto.QueryDTO;
+import pl.softwareplant.swapireports.dto.ReportDTO;
 import pl.softwareplant.swapireports.model.Report;
 import pl.softwareplant.swapireports.service.ReportService;
 
@@ -47,7 +48,7 @@ public class ReportController {
     }
 
     @GetMapping("/{reportId}")
-    public Report findById(@PathVariable Long reportId) {
+    public ReportDTO findById(@PathVariable Long reportId) {
         System.out.println("GET at /reports/" + reportId);
         return reportService.findById(reportId);
     }

@@ -2,7 +2,9 @@ package pl.softwareplant.swapireports.service;
 
 import org.springframework.stereotype.Service;
 import pl.softwareplant.swapireports.dto.QueryDTO;
+import pl.softwareplant.swapireports.dto.ReportDTO;
 import pl.softwareplant.swapireports.dto.RespondDTO;
+import pl.softwareplant.swapireports.mapper.ReportMapper;
 import pl.softwareplant.swapireports.model.Character;
 import pl.softwareplant.swapireports.model.*;
 import pl.softwareplant.swapireports.repository.*;
@@ -23,20 +25,22 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final ResultRepository resultRepository;
     private final SwapiRequester swapiRequester;
-
+    private final ReportMapper reportMapper;
 
     public ReportService(CharacterRepository characterRepository,
                          FilmRepository filmRepository,
                          PlanetRepository planetRepository,
                          ReportRepository reportRepository,
                          ResultRepository resultRepository,
-                         SwapiRequester swapiRequester) {
+                         SwapiRequester swapiRequester,
+                         ReportMapper reportMapper) {
         this.characterRepository = characterRepository;
         this.filmRepository = filmRepository;
         this.planetRepository = planetRepository;
         this.reportRepository = reportRepository;
         this.resultRepository = resultRepository;
         this.swapiRequester = swapiRequester;
+        this.reportMapper = reportMapper;
     }
 
     public void saveOrUpdate(Long id, QueryDTO queryDTO) throws IOException, InterruptedException {
@@ -65,9 +69,9 @@ public class ReportService {
         return reportRepository.findAll();
     }
 
-    public Report findById(Long reportId) {
-        return reportRepository.findById(reportId)
-                .orElse(new Report());
+    public ReportDTO findById(Long reportId) {
+        return reportMapper.mapModelToDTO(reportRepository.findById(reportId)
+                .orElse(new Report()));
     }
 
     @Transactional
@@ -121,7 +125,7 @@ public class ReportService {
     }
 
     private Report createReport(Long reportId, QueryDTO queryDTO, Set<Result> films) {
-        return new Report(reportId, queryDTO.getQuery_criteria_character_phrase(), queryDTO.getQuery_criteria_character_phrase(), films);
+        return new Report(reportId, queryDTO.getQuery_criteria_character_phrase(), queryDTO.getQuery_criteria_planet_name(), films);
     }
 
 }
