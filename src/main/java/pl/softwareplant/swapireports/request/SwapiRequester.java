@@ -33,18 +33,16 @@ public class SwapiRequester {
     @Value("${swapi.url.address}")
     private String SWAPI_URL_ADDRESS;
 
-    private String getRawDataFromSwapi(String endpoint, String query) {
-        String bodyString = null;
-        try {
-            bodyString = getFromSwapi(endpoint, query);
-        } catch (IOException | InterruptedException exception) {
-            log.error("Error requesting data from The Star Wars API", exception);
-//            throw new ConnectException("Error requesting data from The Star Wars API");
-        }
-        return bodyString;
+    private String getRawDataFromSwapi(String endpoint, String query) throws IOException, InterruptedException {
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create(SWAPI_URL_ADDRESS + endpoint + query))
+                .GET()
+                .build();
+        HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        return httpResponse.body();
     }
 
-    private Set<RespondDTO> getCharactersOrPlanets(String endpoint, String query) {
+    private Set<RespondDTO> getCharactersOrPlanets(String endpoint, String query) throws IOException, InterruptedException {
 
         Set<RespondDTO> respondDTOs = new HashSet<>();
         String bodyString = getRawDataFromSwapi(endpoint, query);
@@ -64,32 +62,23 @@ public class SwapiRequester {
         return respondDTOs;
     }
 
-    private Long getIdFromUrl(String url) {
-        return Long.parseLong(url.substring(SWAPI_URL_ADDRESS.length())
-                .replaceAll("\\D+",""));
-    }
-
-    public Set<RespondDTO> getCharacters(String query) {
+    public Set<RespondDTO> getCharacters(String query) throws IOException, InterruptedException {
         return getCharactersOrPlanets(CHARACTER_REQUEST_ENDPOINT, query);
     }
 
-    public Set<RespondDTO> getPlanets(String query) {
+    public Set<RespondDTO> getPlanets(String query) throws IOException, InterruptedException {
         return getCharactersOrPlanets(PLANET_REQUEST_ENDPOINT, query);
     }
 
-    public String getTitleFromFilmId(Long filmId) {
+    public String getTitleFromFilmId(Long filmId) throws IOException, InterruptedException {
         String bodyString = getRawDataFromSwapi(FILM_REQUEST_ENDPOINT, filmId.toString());
         JSONObject bodyJson = new JSONObject(bodyString);
         return bodyJson.getString("title");
     }
 
-    public String getFromSwapi(String endpoint, String query) throws IOException, InterruptedException {
-        HttpRequest httpRequest = HttpRequest.newBuilder()
-                .uri(URI.create(SWAPI_URL_ADDRESS + endpoint + query))
-                .GET()
-                .build();
-        HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        return httpResponse.body();
+    private Long getIdFromUrl(String url) {
+        return Long.parseLong(url.substring(SWAPI_URL_ADDRESS.length())
+                .replaceAll("\\D+",""));
     }
 
 }
