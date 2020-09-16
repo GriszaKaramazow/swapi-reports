@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,6 +20,7 @@ public class SwapiRequester {
 
     private final HttpClient httpClient = HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.ALWAYS)
+            .connectTimeout(Duration.ofSeconds(2))
             .build();
 
     @Value("${swapi.character.request}")
@@ -48,8 +50,7 @@ public class SwapiRequester {
         String bodyString = getRawDataFromSwapi(endpoint, query);
         JSONObject bodyJson = new JSONObject(bodyString);
         JSONArray resultArray = bodyJson.getJSONArray("results");
-        int resultCount = bodyJson.getInt("count");
-        for (int i = 0; i < resultCount; i++) {
+        for (int i = 0; i < resultArray.length(); i++) {
             Long resourceId = getIdFromUrl(resultArray.getJSONObject(i)
                     .getString("url"));
             String resourceName = resultArray.getJSONObject(i)

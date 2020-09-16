@@ -55,7 +55,8 @@ public class ReportService {
             characters = swapiRequester.getCharacters(queryDTO.getQuery_criteria_character_phrase());
             planets = swapiRequester.getPlanets(queryDTO.getQuery_criteria_planet_name());
         } catch (IOException | InterruptedException exception) {
-            throw new ExternalConnectionException("Error requesting data from The Star Wars API");
+            log.error("Error requesting data from The Star Wars API", exception);
+            throw new ExternalConnectionException("Error requesting data from the Star Wars API");
         }
         Set<Result> results = new HashSet<>();
         for (RespondDTO character : characters) {
@@ -143,7 +144,7 @@ public class ReportService {
         result.setCharacter(character);
         result.setPlanet(planet);
         resultRepository.save(result);
-        log.info("character {id=" + result.getId() + "} have been added. " + result.toString());
+        log.info("result {id=" + result.getId() + "} have been added. " + result.toString());
         return result;
     }
 
