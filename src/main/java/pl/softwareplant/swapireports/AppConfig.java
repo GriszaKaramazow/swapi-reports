@@ -17,4 +17,5 @@ public class AppConfig {
     public ReportMapper reportMapper() {
         return new ReportMapper();
     }
+
 }

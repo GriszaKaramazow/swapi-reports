@@ -1,15 +1,16 @@
 package pl.softwareplant.swapireports.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import pl.softwareplant.swapireports.dto.QueryDTO;
 import pl.softwareplant.swapireports.dto.ReportDTO;
-import pl.softwareplant.swapireports.model.Report;
 import pl.softwareplant.swapireports.service.ReportService;
 
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/reports")
 public class ReportController {
@@ -23,33 +24,33 @@ public class ReportController {
     @PutMapping("/{reportId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateOrCreateReport(@PathVariable Long reportId, @RequestBody QueryDTO queryDTO) throws IOException, InterruptedException {
-        System.out.println("PUT at /reports/" + reportId);
+        log.info("PUT request have been received at /reports/" + reportId);
         reportService.saveOrUpdate(reportId, queryDTO);
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAll() {
-        System.out.println("DELETE at /reports");
+        log.info("DELETE request have been received at /reports/");
         reportService.deleteAll();
     }
 
     @DeleteMapping("/{reportId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteById(@PathVariable Long reportId) {
-        System.out.println("DELETE at /reports/" + reportId);
+        log.info("DELETE request have been received at /reports/" + reportId);
         reportService.deleteById(reportId);
     }
 
     @GetMapping
-    public List<Report> findAll() {
-        System.out.println("GET at /reports");
+    public List<ReportDTO> findAll() {
+        log.info("GET request have been received at /reports/");
         return reportService.findAll();
     }
 
     @GetMapping("/{reportId}")
     public ReportDTO findById(@PathVariable Long reportId) {
-        System.out.println("GET at /reports/" + reportId);
+        log.info("GET request have been received at /reports/" + reportId);
         return reportService.findById(reportId);
     }
 

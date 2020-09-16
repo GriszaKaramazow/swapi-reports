@@ -2,6 +2,7 @@ package pl.softwareplant.swapireports.request;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import pl.softwareplant.swapireports.dto.RespondDTO;
 
 import java.io.IOException;
@@ -20,8 +21,14 @@ public class SwapiRequester {
             .followRedirects(HttpClient.Redirect.ALWAYS)
             .build();
 
-    private final String CHARACTER_SEARCH_ENDPOINT = "/people/?search=";
-    private final String PLANET_SEARCH_ENDPOINT = "/planets/?search=";
+    @Value("${swapi.character.request}")
+    private String CHARACTER_REQUEST_ENDPOINT;
+
+    @Value("${swapi.planet.request}")
+    private String PLANET_REQUEST_ENDPOINT;
+
+    @Value("${swapi.url.address}")
+    private String SWAPI_URL_ADDRESS;
     
     private Set<RespondDTO> getCharactersOrPlanets(String endpoint, String query) throws IOException, InterruptedException {
 
@@ -44,16 +51,16 @@ public class SwapiRequester {
     }
 
     private Long getIdFromUrl(String url) {
-        return Long.parseLong(url.substring("http://localhost:8080/api".length())
+        return Long.parseLong(url.substring(SWAPI_URL_ADDRESS.length())
                 .replaceAll("\\D+",""));
     }
 
     public Set<RespondDTO> getCharacters(String query) throws IOException, InterruptedException {
-        return getCharactersOrPlanets(CHARACTER_SEARCH_ENDPOINT, query);
+        return getCharactersOrPlanets(CHARACTER_REQUEST_ENDPOINT, query);
     }
 
     public Set<RespondDTO> getPlanets(String query) throws IOException, InterruptedException {
-        return getCharactersOrPlanets(PLANET_SEARCH_ENDPOINT, query);
+        return getCharactersOrPlanets(PLANET_REQUEST_ENDPOINT, query);
     }
 
     public Map<Long, String> getTitlesFromIds(Set<Long> filmIds) throws IOException, InterruptedException {
@@ -72,7 +79,7 @@ public class SwapiRequester {
 
     public String getFromSwapi(String endpoint, String query) throws IOException, InterruptedException {
         HttpRequest httpRequest = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8080/api" + endpoint + query))
+                .uri(URI.create(SWAPI_URL_ADDRESS + endpoint + query))
                 .GET()
                 .build();
         HttpResponse<String> httpResponse = httpClient

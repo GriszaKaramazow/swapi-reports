@@ -1,5 +1,6 @@
 package pl.softwareplant.swapireports.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.softwareplant.swapireports.dto.QueryDTO;
 import pl.softwareplant.swapireports.dto.ReportDTO;
@@ -16,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 @Service
 public class ReportService {
 
@@ -55,18 +57,22 @@ public class ReportService {
             }
         }
         reportRepository.save(createReport(id, queryDTO, films));
+        log.info("report {id=" + id + "} have been saved");
     }
 
     public void deleteAll() {
         reportRepository.deleteAll();
+        log.info("all reports have been deleted");
+
     }
 
     public void deleteById(Long id) {
         reportRepository.deleteById(id);
+        log.info("report {id=" + id + "} have been deleted");
     }
 
-    public List<Report> findAll() {
-        return reportRepository.findAll();
+    public List<ReportDTO> findAll() {
+        return reportMapper.mapModelListToDTOList(reportRepository.findAll());
     }
 
     public ReportDTO findById(Long reportId) {

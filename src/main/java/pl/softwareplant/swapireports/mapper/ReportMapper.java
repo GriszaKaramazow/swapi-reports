@@ -5,10 +5,20 @@ import pl.softwareplant.swapireports.dto.ResultDTO;
 import pl.softwareplant.swapireports.model.Report;
 import pl.softwareplant.swapireports.model.Result;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class ReportMapper {
+
+    public List<ReportDTO> mapModelListToDTOList(List<Report> reports) {
+        List<ReportDTO> reportDTOs = new ArrayList<>();
+        for (Report report : reports) {
+            reportDTOs.add(mapModelToDTO(report));
+        }
+        return reportDTOs;
+    }
 
     public ReportDTO mapModelToDTO(Report report) {
         ReportDTO reportDTO = new ReportDTO();
@@ -37,4 +47,5 @@ public class ReportMapper {
         resultDTO.setPlanetName(result.getPlanet().getName());
         return resultDTO;
     }
+
 }
