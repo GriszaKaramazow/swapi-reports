@@ -43,7 +43,7 @@ public class ReportMapperTests {
 
 
         // when
-        ReportDTO mapperReportDTO = reportMapper.mapReportToReportDTO(testSubject);
+        ReportDTO resultReportDTO = reportMapper.mapReportToReportDTO(testSubject);
 
         // then
         ResultDTO resultDTO = new ResultDTO();
@@ -60,11 +60,11 @@ public class ReportMapperTests {
         expectedReportDTO.setQueryCriteriaPlanetName("bespin");
         expectedReportDTO.setResults(resultDTOs);
 
-        assertEquals(mapperReportDTO.getId(), expectedReportDTO.getId());
-        assertEquals(mapperReportDTO.getQueryCriteriaCharacterPhrase(), expectedReportDTO.getQueryCriteriaCharacterPhrase());
-        assertEquals(mapperReportDTO.getQueryCriteriaPlanetName(), expectedReportDTO.getQueryCriteriaPlanetName());
-        assertTrue(mapperReportDTO.getResults().containsAll(expectedReportDTO.getResults()));
+        assertEquals(resultReportDTO.getId(), expectedReportDTO.getId());
+        assertEquals(resultReportDTO.getQueryCriteriaCharacterPhrase(), expectedReportDTO.getQueryCriteriaCharacterPhrase());
+        assertEquals(resultReportDTO.getQueryCriteriaPlanetName(), expectedReportDTO.getQueryCriteriaPlanetName());
+        assertTrue(resultReportDTO.getResults().containsAll(expectedReportDTO.getResults()));
 
     }
-    
+
 }
