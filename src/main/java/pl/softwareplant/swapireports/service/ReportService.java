@@ -85,14 +85,14 @@ public class ReportService {
     }
 
     public List<ReportDTO> findAll() {
-        return reportMapper.mapModelListToDTOList(reportRepository.findAll());
+        return reportMapper.mapReportListToReportDTOList(reportRepository.findAll());
     }
 
     public ReportDTO getOne(Long id) {
         if (!reportRepository.existsById(id)) {
             throw new ResourceNotFoundException("report {id=" + id + "} have not been found");
         }
-        return reportMapper.mapModelToDTO(reportRepository.getOne(id));
+        return reportMapper.mapReportToReportDTO(reportRepository.getOne(id));
     }
 
     private Character getOrSaveCharacter(RespondDTO respondDTO) {

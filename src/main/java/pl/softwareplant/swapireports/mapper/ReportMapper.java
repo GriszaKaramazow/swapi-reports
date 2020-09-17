@@ -12,15 +12,15 @@ import java.util.Set;
 
 public class ReportMapper {
 
-    public List<ReportDTO> mapModelListToDTOList(List<Report> reports) {
+    public List<ReportDTO> mapReportListToReportDTOList(List<Report> reports) {
         List<ReportDTO> reportDTOs = new ArrayList<>();
         for (Report report : reports) {
-            reportDTOs.add(mapModelToDTO(report));
+            reportDTOs.add(mapReportToReportDTO(report));
         }
         return reportDTOs;
     }
 
-    public ReportDTO mapModelToDTO(Report report) {
+    public ReportDTO mapReportToReportDTO(Report report) {
         ReportDTO reportDTO = new ReportDTO();
         reportDTO.setId(report.getId());
         reportDTO.setQueryCriteriaCharacterPhrase(report.getQueryCriteriaCharacterPhrase());
