@@ -5,6 +5,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import pl.softwareplant.swapireports.dto.RespondDTO;
 
 import java.io.IOException;
@@ -12,14 +13,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.TestInstance.Lifecycle;
 
+@AutoConfigureWebTestClient
 @TestInstance(Lifecycle.PER_CLASS)
 public class SwapiRequesterTests {
 
 
-    private final WireMockServer mockedServer = new WireMockServer();
+    private final WireMockServer mockedServer = new WireMockServer(wireMockConfig().port(8080));
 
     @BeforeAll
     public void startServer() {
